@@ -1,0 +1,55 @@
+# setting tomcat
+server:
+  port: 8761
+  address: localhost
+
+# 配置信息
+info:
+  application:
+    name: 注册中心
+    version: 1.0-SNAPSHOT
+    owner: maiyar.cn
+    author: Coison
+
+# 上下文信息
+management:
+  address: localhost
+  context-path: /admin
+
+#Spring Boot Admin 监控配置
+spring:
+  boot:
+    admin:
+      turbine:
+        enabled: false
+        location: http://${server.address}:9999/turbine.stream # /turbine.stream Turbine服务器的ServiceId或URL（不带路径）。必须从管理服务器可以访问。
+        clusters: default
+      routes:  # zuul
+        endpoints: env,metrics,trace,dump,jolokia,info,configprops,trace,logfile,refresh,flyway,liquibase,heapdump,activiti
+      username: "${security.user.name}"  #These two are needed so that the client
+      password: "${security.user.password}" #can register at the protected server api
+      url: http://${server.address}:${server.port}  # 服务注册地址
+#      api-path: "api/applications" # 注册端点的Http路径在您的管理服务器上
+      monitor:
+        period: 10  # 重复注册的间隔（以ms为单位）。
+      client:
+        prefer-ip: true # 使用ip-address，而不是被猜测的url中的主机名 它被使用。否则InetAddress.getLocalHost()将使用返回的IP地址。
+#        enabled: true # 启用S​​pring Boot Admin Client。
+#        name:  @project.name@ # 要注册的名称
+        metadata:
+          user.name: "${security.user.name}"  #These two are needed so that the server
+          user.password: "${security.user.password}"
+#        health-url:  # Client-health-url注册。如果可访问的URL不同（例如Docker），可以被覆盖。在注册表中必须是唯一的
+      auto-registration: true   # 如果设置为true，则在应用程序准备就绪后自动计划定期注册应用程序任务
+      register-once: true #如果设置为true，客户端将仅注册一个管理服务器（按照定义spring.boot.admin.url）。如果该管理服务器关闭，将自动向下一个管理服务器注册。如果为false，将注册所有管理服务器。
+      context-path: /admin
+  mvc:
+    async:
+      request-timeout: -1
+security:
+  user:
+    name: user
+    password: 123456
+management:
+  security:
+    enabled: true
